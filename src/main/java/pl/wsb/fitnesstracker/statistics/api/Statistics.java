@@ -20,7 +20,7 @@ public class Statistics {
     @Nullable
     private Long id;
 
-    @ManyToMany
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

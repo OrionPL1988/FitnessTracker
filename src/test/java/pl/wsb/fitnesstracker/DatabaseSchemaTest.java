@@ -68,7 +68,7 @@ class DatabaseSchemaTest {
     void statisticsTableHasExpectedColumns() throws Exception {
         try (Connection conn = dataSource.getConnection()) {
             Set<String> cols = tableColumns(conn, "statistics");
-            assertThat(cols).contains("id", "user_id");
+            assertThat(cols).contains("id", "user_id", "total_distance", "total_trainings", "total_calories_burned");
         }
     }
 

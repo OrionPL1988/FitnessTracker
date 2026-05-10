@@ -1,12 +1,16 @@
 package pl.wsb.fitnesstracker.user.internal;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.wsb.fitnesstracker.user.api.User;
 import pl.wsb.fitnesstracker.user.api.UserProvider;
 import pl.wsb.fitnesstracker.user.api.UserService;
+import pl.wsb.fitnesstracker.user.api.UserUpdateDto;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +22,7 @@ class UserServiceImpl implements UserService, UserProvider {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public User createUser(final User user) {
         log.info("Creating User {}", user);
         if (user.getId() != null) {
@@ -41,4 +46,38 @@ class UserServiceImpl implements UserService, UserProvider {
         return userRepository.findAll();
     }
 
+    @Override
+    public List<User> findUsersByEmail(final String emailFragment) {
+        return userRepository.findByEmailContainingIgnoreCase(emailFragment);
+    }
+
+    @Override
+    public List<User> findUsersOlderThan(final LocalDate date) {
+        return userRepository.findByBirthdateBefore(date);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(final Long userId) {
+        log.info("Deleting User with id={}", userId);
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User with ID " + userId + " not found");
+        }
+        userRepository.deleteById(userId);
+    }
+
+    @Override
+    @Transactional
+    public User updateUser(final Long userId, final UserUpdateDto updateDto) {
+        log.info("Updating User with id={}", userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with ID " + userId + " not found"));
+
+        if (updateDto.firstName() != null) user.setFirstName(updateDto.firstName());
+        if (updateDto.lastName() != null)  user.setLastName(updateDto.lastName());
+        if (updateDto.birthdate() != null) user.setBirthdate(updateDto.birthdate());
+        if (updateDto.email() != null)     user.setEmail(updateDto.email());
+
+        return userRepository.save(user);
+    }
 }

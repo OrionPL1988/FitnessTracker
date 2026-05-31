@@ -2,7 +2,7 @@ package pl.wsb.fitnesstracker.user.api;
 
 /**
  * Interface (API) for modifying operations on {@link User} entities through the API.
- * Implementing classes are responsible for executing changes within a database transaction, whether by continuing an existing transaction or creating a new one if required.
+ * Implementing classes are responsible for executing changes within a database transaction.
  */
 public interface UserService {
 
@@ -14,4 +14,19 @@ public interface UserService {
      */
     User createUser(User user);
 
+    /**
+     * Updates an existing user.
+     *
+     * @param userId ID of the user to update
+     * @param user new user data
+     * @return updated user
+     */
+    User updateUser(Long userId, User user);
+
+    /**
+     * Deletes user by ID.
+     *
+     * @param userId ID of the user to delete
+     */
+    void deleteUser(Long userId);
 }
